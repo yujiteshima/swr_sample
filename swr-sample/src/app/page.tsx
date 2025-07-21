@@ -1,12 +1,11 @@
 'use client';
 
 import { useState } from 'react';
-import useSWR from 'swr';
-
-const fetcher = (url: string) => fetch(url).then((res) => res.json());
+import { useCachedRequest } from '../hooks/useCachedRequest';
+import { useNonCachedRequest } from '../hooks/useNonCachedRequest';
 
 function CachedRequest({ url, trigger }: { url: string; trigger: number }) {
-  const { data, error, isLoading } = useSWR(trigger > 0 ? url : null, fetcher);
+  const { data, error, isLoading } = useCachedRequest(url, trigger);
 
   if (!trigger) {
     return (
@@ -31,15 +30,7 @@ function CachedRequest({ url, trigger }: { url: string; trigger: number }) {
 }
 
 function NonCachedRequest({ url, trigger }: { url: string; trigger: number }) {
-  const { data, error, isLoading } = useSWR(
-    trigger > 0 ? [url, trigger] : null, 
-    ([url]) => fetcher(url),
-    {
-      revalidateOnFocus: true,
-      revalidateOnReconnect: true,
-      dedupingInterval: 0
-    }
-  );
+  const { data, error, isLoading } = useNonCachedRequest(url, trigger);
 
   if (!trigger) {
     return (
